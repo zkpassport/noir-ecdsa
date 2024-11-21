@@ -24,11 +24,15 @@ use crate::brainpoolP384t1::curve::BrainpoolP384t1_Params;
 use crate::brainpoolP512r1::params::BrainpoolP512r1_Fq_Params;
 use crate::brainpoolP512r1::curve::BrainpoolP512r1_Params;
 
+use crate::brainpoolP512t1::params::BrainpoolP512t1_Fq_Params;
+use crate::brainpoolP512t1::curve::BrainpoolP512t1_Params;
+
 type BrainpoolP256r1BN = BigNum<3, 256, BrainpoolP256r1_Fq_Params>;
 type BrainpoolP256t1BN = BigNum<3, 256, BrainpoolP256t1_Fq_Params>;
 type BrainpoolP384r1BN = BigNum<4, 384, BrainpoolP384r1_Fq_Params>;
 type BrainpoolP384t1BN = BigNum<4, 384, BrainpoolP384t1_Fq_Params>;
 type BrainpoolP512r1BN = BigNum<5, 512, BrainpoolP512r1_Fq_Params>;
+type BrainpoolP512t1BN = BigNum<5, 512, BrainpoolP512t1_Fq_Params>;
 type Secp521r1BN = BigNum<5, 521, Secp521r1_Fq_Params>;
 type Secp384r1BN = BigNum<4, 384, Secp384r1_Fq_Params>;
 
@@ -151,10 +155,16 @@ fn offset_generator() {
         //     "BrainpoolP384t1_Params",
         //     1,
         // );
-        compute_and_print_offset_generators::<BrainpoolP512r1BN, BrainpoolP512r1_Params, _, _, 129>(
+        // compute_and_print_offset_generators::<BrainpoolP512r1BN, BrainpoolP512r1_Params, _, _, 129>(
+        //     5,
+        //     "BrainpoolP512r1_Fq_Params",
+        //     "BrainpoolP512r1_Params",
+        //     1,
+        // );
+        compute_and_print_offset_generators::<BrainpoolP512t1BN, BrainpoolP512t1_Params, _, _, 129>(
             5,
-            "BrainpoolP512r1_Fq_Params",
-            "BrainpoolP512r1_Params",
+            "BrainpoolP512t1_Fq_Params",
+            "BrainpoolP512t1_Params",
             1,
         );
         // compute_and_print_offset_generators::<Secp384r1BN, Secp384r1PartialCurveParams, _, _, 97>(
