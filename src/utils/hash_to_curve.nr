@@ -7,6 +7,10 @@ use crate::secp521r1::params::Secp521r1_Fq_Params;
 use crate::secp521r1::curve::Secp521r1_Params;
 use bignum::bignum::BigNum;
 use bignum::fields::secp384r1Fq::Secp384r1_Fq_Params;
+use crate::brainpoolP256r1::params::BrainpoolP256r1_Fq_Params;
+use crate::brainpoolP256r1::curve::BrainpoolP256r1_Params;
+
+type BrainpoolP256r1BN = BigNum<3, 256, BrainpoolP256r1_Fq_Params>;
 
 type Secp521r1BN = BigNum<5, 521, Secp521r1_Fq_Params>;
 type Secp384r1BN = BigNum<4, 384, Secp384r1_Fq_Params>;
@@ -98,12 +102,18 @@ where
 }
 
 #[test]
-fn generate_p521_seed() {
+fn offset_generator() {
     unsafe {
-        compute_and_print_offset_generators::<Secp521r1BN, Secp521r1_Params, _, _, 131>(
-            5,
-            "Secp521r1_Fq_Params",
-            "Secp521r1_Params",
+        // compute_and_print_offset_generators::<Secp521r1BN, Secp521r1_Params, _, _, 131>(
+        //     5,
+        //     "Secp521r1_Fq_Params",
+        //     "Secp521r1_Params",
+        //     1,
+        // );
+        compute_and_print_offset_generators::<BrainpoolP256r1BN, BrainpoolP256r1_Params, _, _, 65>(
+            3,
+            "BrainpoolP256r1_Fq_Params",
+            "BrainpoolP256r1_Params",
             1,
         );
         // compute_and_print_offset_generators::<Secp384r1BN, Secp384r1PartialCurveParams, _, _, 97>(
