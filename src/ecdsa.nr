@@ -6,6 +6,8 @@ use super::brainpoolP384r1::params::{BrainpoolP384r1Fq, BrainpoolP384r1Fr};
 use super::brainpoolP384r1::curve::BrainpoolP384r1_Params;
 use super::brainpoolP384t1::params::{BrainpoolP384t1Fq, BrainpoolP384t1Fr};
 use super::brainpoolP384t1::curve::BrainpoolP384t1_Params;
+use super::brainpoolP512r1::params::{BrainpoolP512r1Fq, BrainpoolP512r1Fr};
+use super::brainpoolP512r1::curve::BrainpoolP512r1_Params;
 use crate::secp521r1::params::{Secp521r1Fq, Secp521r1Fr};
 use crate::secp521r1::curve::{SECP521r1_SCALAR_SLICES, Secp521r1_Params};
 use bigcurve::scalar_field::ScalarField;
@@ -162,6 +164,20 @@ pub fn verify_brainpoolp384t1_ecdsa<let HASH_BYTE_SIZE: u32>(
     signature: (BrainpoolP384t1Fr, BrainpoolP384t1Fr),
 ) -> bool {
     verify_ecdsa::<HASH_BYTE_SIZE, 97, _, _, 48, _, _, BrainpoolP384t1_Params>(
+        public_key_x,
+        public_key_y,
+        message_digest,
+        signature,
+    )
+}
+
+pub fn verify_brainpoolp512r1_ecdsa<let HASH_BYTE_SIZE: u32>(
+    public_key_x: BrainpoolP512r1Fq,
+    public_key_y: BrainpoolP512r1Fq,
+    message_digest: [u8; HASH_BYTE_SIZE],
+    signature: (BrainpoolP512r1Fr, BrainpoolP512r1Fr),
+) -> bool {
+    verify_ecdsa::<HASH_BYTE_SIZE, 129, _, _, 64, _, _, BrainpoolP512r1_Params>(
         public_key_x,
         public_key_y,
         message_digest,
@@ -422,4 +438,59 @@ fn test_brainpoolp384t1_signature_verification() {
     };
 
     assert(verify_brainpoolp384t1_ecdsa(public_key_x, public_key_y, sha256_hash, (r, s)));
+}
+
+#[test]
+fn test_brainpoolp512r1_signature_verification() {
+    let sha256_hash: [u8; 32] =
+        dep::std::hash::sha256("Hello World! This is Noir-ECDSA".as_bytes());
+    assert_eq(
+        sha256_hash,
+        [
+            42, 204, 207, 15, 192, 246, 143, 215, 180, 110, 75, 247, 21, 126, 103, 225, 251, 180,
+            86, 221, 251, 68, 216, 63, 17, 236, 32, 223, 169, 198, 9, 98,
+        ],
+    );
+
+    let r: BrainpoolP512r1Fr = BigNum {
+        limbs: [
+            0x7a42ee3ff773930fd5a75a5f0f8f44,
+            0xe08e9627534dd4b08b51cd50e1ea54,
+            0x4b3b4eb9d0c140412ccc7588387e0c,
+            0x667c21fe6cdf7a38e9cb665b45cd31,
+            0x9c3b9f11,
+        ],
+    };
+
+    let s: BrainpoolP512r1Fr = BigNum {
+        limbs: [
+            0x4c0efd3bd4266b117fc777a1ad6451,
+            0x3cb8fd090b34989d5fe33955debf93,
+            0x6e6cc1d8a6cf561c4f17bbc788b093,
+            0x9a726ed28e27cd04c8bfed6f5cdf4,
+            0xa93fb2dc,
+        ],
+    };
+
+    let public_key_x: BrainpoolP512r1Fq = BigNum {
+        limbs: [
+            0xa84c943bd583159d60859f2cfa0161,
+            0x8f6771c6e3495ce6ddad026936d7a6,
+            0xdeeca2efdbad740deff518494f590a,
+            0x7d4c0f9655b0e3a0fd68d0edaef401,
+            0x6c549ffa,
+        ],
+    };
+
+    let public_key_y: BrainpoolP512r1Fq = BigNum {
+        limbs: [
+            0x82417399c1673ba45056d27d3e2d0,
+            0x66a253b74a0ffa6829acf5ce3a9c8e,
+            0xb92617dff6948f4aa6d9b597351d4e,
+            0x7509a0b89cd0b7efce6622cedf2796,
+            0x840299fc,
+        ],
+    };
+
+    assert(verify_brainpoolp512r1_ecdsa(public_key_x, public_key_y, sha256_hash, (r, s)));
 }
