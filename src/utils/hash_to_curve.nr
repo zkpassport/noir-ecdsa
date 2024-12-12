@@ -1,31 +1,31 @@
-use bignum::BigNumTrait;
-use bignum::bignum::BigNum;
-use bigcurve::CurveParamsTrait;
 use bigcurve::BigCurve;
 use bigcurve::curve_jac::CurveJ;
+use bigcurve::CurveParamsTrait;
+use bignum::bignum::BigNum;
+use bignum::BigNumTrait;
 
-use crate::secp521r1::params::Secp521r1_Fq_Params;
 use crate::secp521r1::curve::Secp521r1_Params;
+use crate::secp521r1::params::Secp521r1_Fq_Params;
 
 use bignum::fields::secp384r1Fq::Secp384r1_Fq_Params;
 
-use crate::brainpoolP256r1::params::BrainpoolP256r1_Fq_Params;
 use crate::brainpoolP256r1::curve::BrainpoolP256r1_Params;
+use crate::brainpoolP256r1::params::BrainpoolP256r1_Fq_Params;
 
-use crate::brainpoolP256t1::params::BrainpoolP256t1_Fq_Params;
 use crate::brainpoolP256t1::curve::BrainpoolP256t1_Params;
+use crate::brainpoolP256t1::params::BrainpoolP256t1_Fq_Params;
 
-use crate::brainpoolP384r1::params::BrainpoolP384r1_Fq_Params;
 use crate::brainpoolP384r1::curve::BrainpoolP384r1_Params;
+use crate::brainpoolP384r1::params::BrainpoolP384r1_Fq_Params;
 
-use crate::brainpoolP384t1::params::BrainpoolP384t1_Fq_Params;
 use crate::brainpoolP384t1::curve::BrainpoolP384t1_Params;
+use crate::brainpoolP384t1::params::BrainpoolP384t1_Fq_Params;
 
-use crate::brainpoolP512r1::params::BrainpoolP512r1_Fq_Params;
 use crate::brainpoolP512r1::curve::BrainpoolP512r1_Params;
+use crate::brainpoolP512r1::params::BrainpoolP512r1_Fq_Params;
 
-use crate::brainpoolP512t1::params::BrainpoolP512t1_Fq_Params;
 use crate::brainpoolP512t1::curve::BrainpoolP512t1_Params;
+use crate::brainpoolP512t1::params::BrainpoolP512t1_Fq_Params;
 
 type BrainpoolP256r1BN = BigNum<3, 256, BrainpoolP256r1_Fq_Params>;
 type BrainpoolP256t1BN = BigNum<3, 256, BrainpoolP256t1_Fq_Params>;
@@ -106,18 +106,18 @@ where
         offset_generator_final[0] = gen.x.__mul(zz);
         offset_generator_final[1] = gen.y.__mul(zzz);
     }
-    println(f"pub struct {curvestr} {}");
+    println(f"pub struct {curvestr} {{}}");
     println(
-        f"impl CurveParamsTrait<BigNum<{n}, {paramstr}>> for {curvestr} {",
+        f"impl CurveParamsTrait<BigNum<{n}, {paramstr}>> for {curvestr} {{",
     );
-    println(f"  fn a() -> BigNum<{n}, {paramstr}> { {a} }");
-    println(f"  fn b() -> BigNum<{n}, {paramstr}> { {b} }");
-    println(f"  fn one() -> [BigNum<{n}, {paramstr}>; 2] { {one} }");
+    println(f"  fn a() -> BigNum<{n}, {paramstr}> {{ {a} }}");
+    println(f"  fn b() -> BigNum<{n}, {paramstr}> {{ {b} }}");
+    println(f"  fn one() -> [BigNum<{n}, {paramstr}>; 2] {{ {one} }}");
     println(
-        f"  fn offset_generator() -> [BigNum<{n}, {paramstr}>; 2] { {offset_generator_initial} }",
+        f"  fn offset_generator() -> [BigNum<{n}, {paramstr}>; 2] {{ {offset_generator_initial} }}",
     );
     println(
-        f"  fn offset_generator_final() -> [BigNum<{n}, {paramstr}>; 2] { {offset_generator_final} }",
+        f"  fn offset_generator_final() -> [BigNum<{n}, {paramstr}>; 2] {{ {offset_generator_final} }}",
     );
     println("}");
 }

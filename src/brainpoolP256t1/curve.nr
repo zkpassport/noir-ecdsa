@@ -1,6 +1,6 @@
-use bignum::BigNum;
 use super::params::BrainpoolP256t1_Fq_Params;
 use dep::bigcurve::CurveParamsTrait;
+use bignum::BigNum;
 
 global BRAINPOOLP256t1_SCALAR_SLICES: u32 = 65;
 pub struct BrainpoolP256t1_Params {}
