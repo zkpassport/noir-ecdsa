@@ -1,24 +1,17 @@
-use super::brainpoolP256r1::params::{BrainpoolP256r1Fq, BrainpoolP256r1Fr};
-use super::brainpoolP256r1::curve::BrainpoolP256r1_Params;
-use super::brainpoolP256t1::params::{BrainpoolP256t1Fq, BrainpoolP256t1Fr};
-use super::brainpoolP256t1::curve::BrainpoolP256t1_Params;
-use super::brainpoolP384r1::params::{BrainpoolP384r1Fq, BrainpoolP384r1Fr};
-use super::brainpoolP384r1::curve::BrainpoolP384r1_Params;
-use super::brainpoolP384t1::params::{BrainpoolP384t1Fq, BrainpoolP384t1Fr};
-use super::brainpoolP384t1::curve::BrainpoolP384t1_Params;
-use super::brainpoolP512r1::params::{BrainpoolP512r1Fq, BrainpoolP512r1Fr};
-use super::brainpoolP512r1::curve::BrainpoolP512r1_Params;
-use super::brainpoolP512t1::params::{BrainpoolP512t1Fq, BrainpoolP512t1Fr};
-use super::brainpoolP512t1::curve::BrainpoolP512t1_Params;
-use crate::secp521r1::params::{Secp521r1Fq, Secp521r1Fr};
-use crate::secp521r1::curve::{SECP521r1_SCALAR_SLICES, Secp521r1_Params};
 use bigcurve::scalar_field::ScalarField;
-use dep::bigcurve::CurveParamsTrait;
+use bigcurve::CurveParamsTrait;
 use bigcurve::BigCurve;
 use bignum::BigNum;
 use bignum::params::BigNumParamsGetter;
 use bigcurve::curves::secp384r1::{Secp384r1Fq, Secp384r1Fr, Secp384r1_Params};
 use bigcurve::curves::secp256r1::{Secp256r1Fq, Secp256r1Fr, Secp256r1_Params};
+use bigcurve::curves::secp521r1::{Secp521r1Fq, Secp521r1Fr, Secp521r1_Params};
+use bigcurve::curves::brainpoolP256r1::{BrainpoolP256r1Fq, BrainpoolP256r1Fr, BrainpoolP256r1_Params};
+use bigcurve::curves::brainpoolP256t1::{BrainpoolP256t1Fq, BrainpoolP256t1Fr, BrainpoolP256t1_Params};
+use bigcurve::curves::brainpoolP384r1::{BrainpoolP384r1Fq, BrainpoolP384r1Fr, BrainpoolP384r1_Params};
+use bigcurve::curves::brainpoolP384t1::{BrainpoolP384t1Fq, BrainpoolP384t1Fr, BrainpoolP384t1_Params};
+use bigcurve::curves::brainpoolP512r1::{BrainpoolP512r1Fq, BrainpoolP512r1Fr, BrainpoolP512r1_Params};
+use bigcurve::curves::brainpoolP512t1::{BrainpoolP512t1Fq, BrainpoolP512t1Fr, BrainpoolP512t1_Params};
 
 // https://github.com/madztheo/noir-ecdsa/blob/main/lib/src/secp384r1.nr
 pub fn verify_ecdsa<let HASH_BYTE_SIZE: u32, let SCALAR_SLICES: u32, let LIMBS: u32, let MODULUS_BIT_SIZE: u32, let BYTES: u32, Fq_PARAMS, Fr_PARAMS, CurveParams>(
