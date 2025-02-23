@@ -1,17 +1,29 @@
-use bigcurve::scalar_field::ScalarField;
-use bigcurve::CurveParamsTrait;
 use bigcurve::BigCurve;
+use bigcurve::CurveParamsTrait;
+use bigcurve::curves::brainpoolP256r1::{
+    BrainpoolP256r1_Params, BrainpoolP256r1Fq, BrainpoolP256r1Fr,
+};
+use bigcurve::curves::brainpoolP256t1::{
+    BrainpoolP256t1_Params, BrainpoolP256t1Fq, BrainpoolP256t1Fr,
+};
+use bigcurve::curves::brainpoolP384r1::{
+    BrainpoolP384r1_Params, BrainpoolP384r1Fq, BrainpoolP384r1Fr,
+};
+use bigcurve::curves::brainpoolP384t1::{
+    BrainpoolP384t1_Params, BrainpoolP384t1Fq, BrainpoolP384t1Fr,
+};
+use bigcurve::curves::brainpoolP512r1::{
+    BrainpoolP512r1_Params, BrainpoolP512r1Fq, BrainpoolP512r1Fr,
+};
+use bigcurve::curves::brainpoolP512t1::{
+    BrainpoolP512t1_Params, BrainpoolP512t1Fq, BrainpoolP512t1Fr,
+};
+use bigcurve::curves::secp256r1::{Secp256r1_Params, Secp256r1Fq, Secp256r1Fr};
+use bigcurve::curves::secp384r1::{Secp384r1_Params, Secp384r1Fq, Secp384r1Fr};
+use bigcurve::curves::secp521r1::{Secp521r1_Params, Secp521r1Fq, Secp521r1Fr};
+use bigcurve::scalar_field::ScalarField;
 use bignum::BigNum;
 use bignum::params::BigNumParamsGetter;
-use bigcurve::curves::secp384r1::{Secp384r1Fq, Secp384r1Fr, Secp384r1_Params};
-use bigcurve::curves::secp256r1::{Secp256r1Fq, Secp256r1Fr, Secp256r1_Params};
-use bigcurve::curves::secp521r1::{Secp521r1Fq, Secp521r1Fr, Secp521r1_Params};
-use bigcurve::curves::brainpoolP256r1::{BrainpoolP256r1Fq, BrainpoolP256r1Fr, BrainpoolP256r1_Params};
-use bigcurve::curves::brainpoolP256t1::{BrainpoolP256t1Fq, BrainpoolP256t1Fr, BrainpoolP256t1_Params};
-use bigcurve::curves::brainpoolP384r1::{BrainpoolP384r1Fq, BrainpoolP384r1Fr, BrainpoolP384r1_Params};
-use bigcurve::curves::brainpoolP384t1::{BrainpoolP384t1Fq, BrainpoolP384t1Fr, BrainpoolP384t1_Params};
-use bigcurve::curves::brainpoolP512r1::{BrainpoolP512r1Fq, BrainpoolP512r1Fr, BrainpoolP512r1_Params};
-use bigcurve::curves::brainpoolP512t1::{BrainpoolP512t1Fq, BrainpoolP512t1Fr, BrainpoolP512t1_Params};
 
 // https://github.com/madztheo/noir-ecdsa/blob/main/lib/src/secp384r1.nr
 pub fn verify_ecdsa<let HASH_BYTE_SIZE: u32, let SCALAR_SLICES: u32, let LIMBS: u32, let MODULUS_BIT_SIZE: u32, let BYTES: u32, Fq_PARAMS, Fr_PARAMS, CurveParams>(
@@ -42,7 +54,11 @@ where
         BigNum::from_be_bytes(formatted_message_digest);
 
     // 3. Compute w = s^-1 mod n
-    let w = s.__invmod();
+    let w = unsafe {
+        //@safety: the inverse is computed here unconstrained but we make sure
+        // the inverse is valid by checking that s * w == 1 the line below
+        s.__invmod()
+    };
     // Check that s is the inverse of w since the previous line is unconstrained
     assert(s * w == BigNum::one());
 
