@@ -1,4 +1,5 @@
 use bigcurve::BigCurve;
+use bigcurve::BigCurveTrait;
 use bigcurve::CurveParamsTrait;
 use bigcurve::curves::brainpoolP256r1::{
     BrainpoolP256r1_Params, BrainpoolP256r1Fq, BrainpoolP256r1Fr,
@@ -22,8 +23,11 @@ use bigcurve::curves::secp256r1::{Secp256r1_Params, Secp256r1Fq, Secp256r1Fr};
 use bigcurve::curves::secp384r1::{Secp384r1_Params, Secp384r1Fq, Secp384r1Fr};
 use bigcurve::curves::secp521r1::{Secp521r1_Params, Secp521r1Fq, Secp521r1Fr};
 use bigcurve::scalar_field::ScalarField;
+use bigcurve::scalar_field::ScalarFieldTrait;
 use bignum::BigNum;
+use bignum::BigNumTrait;
 use bignum::params::BigNumParamsGetter;
+use sha256::sha256_var;
 
 // https://github.com/madztheo/noir-ecdsa/blob/main/lib/src/secp384r1.nr
 pub fn verify_ecdsa<let HASH_BYTE_SIZE: u32, let SCALAR_SLICES: u32, let LIMBS: u32, let MODULUS_BIT_SIZE: u32, let BYTES: u32, Fq_PARAMS, Fr_PARAMS, CurveParams>(
@@ -212,8 +216,7 @@ pub fn verify_brainpoolp512t1_ecdsa<let HASH_BYTE_SIZE: u32>(
 
 #[test]
 fn test_secp521r1_signature_verification() {
-    let sha256_hash: [u8; 32] =
-        dep::std::hash::sha256("Hello World! This is Noir-ECDSA".as_bytes());
+    let sha256_hash: [u8; 32] = sha256_var("Hello World! This is Noir-ECDSA".as_bytes(), 31);
     assert_eq(
         sha256_hash,
         [
@@ -262,8 +265,7 @@ fn test_secp521r1_signature_verification() {
 
 #[test]
 fn test_secp384r1_signature_verification() {
-    let sha256_hash: [u8; 32] =
-        dep::std::hash::sha256("Hello World! This is Noir-ECDSA".as_bytes());
+    let sha256_hash: [u8; 32] = sha256_var("Hello World! This is Noir-ECDSA".as_bytes(), 31);
     assert_eq(
         sha256_hash,
         [
@@ -308,8 +310,7 @@ fn test_secp384r1_signature_verification() {
 
 #[test]
 fn test_secp256r1_signature_verification() {
-    let sha256_hash: [u8; 32] =
-        dep::std::hash::sha256("Hello World! This is Noir-ECDSA".as_bytes());
+    let sha256_hash: [u8; 32] = sha256_var("Hello World! This is Noir-ECDSA".as_bytes(), 31);
     assert_eq(
         sha256_hash,
         [
@@ -334,8 +335,7 @@ fn test_secp256r1_signature_verification() {
 
 #[test]
 fn test_brainpoolp256r1_signature_verification() {
-    let sha256_hash: [u8; 32] =
-        dep::std::hash::sha256("Hello World! This is Noir-ECDSA".as_bytes());
+    let sha256_hash: [u8; 32] = sha256_var("Hello World! This is Noir-ECDSA".as_bytes(), 31);
     assert_eq(
         sha256_hash,
         [
@@ -365,8 +365,7 @@ fn test_brainpoolp256r1_signature_verification() {
 
 #[test]
 fn test_brainpoolp384r1_signature_verification() {
-    let sha256_hash: [u8; 32] =
-        dep::std::hash::sha256("Hello World! This is Noir-ECDSA".as_bytes());
+    let sha256_hash: [u8; 32] = sha256_var("Hello World! This is Noir-ECDSA".as_bytes(), 31);
     assert_eq(
         sha256_hash,
         [
@@ -416,8 +415,7 @@ fn test_brainpoolp384r1_signature_verification() {
 
 #[test]
 fn test_brainpoolp384t1_signature_verification() {
-    let sha256_hash: [u8; 32] =
-        dep::std::hash::sha256("Hello World! This is Noir-ECDSA".as_bytes());
+    let sha256_hash: [u8; 32] = sha256_var("Hello World! This is Noir-ECDSA".as_bytes(), 31);
     assert_eq(
         sha256_hash,
         [
@@ -467,8 +465,7 @@ fn test_brainpoolp384t1_signature_verification() {
 
 #[test]
 fn test_brainpoolp512r1_signature_verification() {
-    let sha256_hash: [u8; 32] =
-        dep::std::hash::sha256("Hello World! This is Noir-ECDSA".as_bytes());
+    let sha256_hash: [u8; 32] = sha256_var("Hello World! This is Noir-ECDSA".as_bytes(), 31);
     assert_eq(
         sha256_hash,
         [
@@ -522,8 +519,7 @@ fn test_brainpoolp512r1_signature_verification() {
 
 #[test]
 fn test_brainpoolp512t1_signature_verification() {
-    let sha256_hash: [u8; 32] =
-        dep::std::hash::sha256("Hello World! This is Noir-ECDSA".as_bytes());
+    let sha256_hash: [u8; 32] = sha256_var("Hello World! This is Noir-ECDSA".as_bytes(), 31);
     assert_eq(
         sha256_hash,
         [
