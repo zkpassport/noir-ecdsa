@@ -47,15 +47,8 @@ where
     // 2. Validate that s is in canonical form (s <= n/2) to prevent signature malleability
     // i.e. you could have two valid signatures (r, s) and (r, n - s) from one signature (r, s)
     let n = BigNum::<LIMBS, MODULUS_BIT_SIZE, Fr_PARAMS>::modulus();
-    let two = BigNum::<LIMBS, MODULUS_BIT_SIZE, Fr_PARAMS>::from(2);
-    let n_half = unsafe { n.udiv(two) };
-    // Make sure the unconstrained division is correct
-    // Because n is always odd, n_half * two + 1 will always be equal to n
-    assert_eq(
-        n_half * two + BigNum::<LIMBS, MODULUS_BIT_SIZE, Fr_PARAMS>::one(),
-        n,
-        "the half of n is not correct",
-    );
+    // Note: with udiv the result of the unconstrained division is already constrained so need for further checks
+    let n_half = n.udiv(BigNum::<LIMBS, MODULUS_BIT_SIZE, Fr_PARAMS>::from(2));
     assert(s <= n_half, "Signature s value is not in canonical form");
 
     // 3. Pad the message digest to `BYTES` bytes and convert to a BigNum
