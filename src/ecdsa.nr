@@ -44,7 +44,14 @@ where
     // 1. Unpack the signature (r, s)
     let (r, s) = signature;
 
-    // 2. Pad the message digest to `BYTES` bytes and convert to a BigNum
+    // 2. Validate that s is in canonical form (s <= n/2) to prevent signature malleability
+    // i.e. you could have two valid signatures (r, s) and (r, n - s) from one signature (r, s)
+    // We check if 2*s <= n, which is equivalent to check if double_s >= s
+    // as if 2*s > n, then double_s will have wrapped around n and will be less than s
+    let double_s = s + s;
+    assert(double_s >= s, "Signature s value is not in canonical form");
+
+    // 3. Pad the message digest to `BYTES` bytes and convert to a BigNum
     let mut formatted_message_digest: [u8; BYTES] = [0; BYTES];
     let mut startIndex = 0;
 
@@ -57,7 +64,7 @@ where
     let e: BigNum<LIMBS, MODULUS_BIT_SIZE, Fr_PARAMS> =
         BigNum::from_be_bytes(formatted_message_digest);
 
-    // 3. Compute w = s^-1 mod n
+    // 4. Compute w = s^-1 mod n
     let w = unsafe {
         //@safety: the inverse is computed here unconstrained but we make sure
         // the inverse is valid by checking that s * w == 1 the line below
@@ -66,7 +73,7 @@ where
     // Check that s is the inverse of w since the previous line is unconstrained
     assert(s * w == BigNum::one());
 
-    // 4. Compute u1 = ew mod n and u2 = rw mod n
+    // 5. Compute u1 = ew mod n and u2 = rw mod n
     let u_1: ScalarField<SCALAR_SLICES> = ScalarField::from_bignum(e * w);
     let u_2: ScalarField<SCALAR_SLICES> = ScalarField::from_bignum(r * w);
 
@@ -77,13 +84,13 @@ where
 
     let gen: BigCurve<BigNum<LIMBS, MODULUS_BIT_SIZE, Fq_PARAMS>, CurveParams> = BigCurve::one();
 
-    // 5. Compute the point R = u1G + u2Q
+    // 6. Compute the point R = u1G + u2Q
     let r_point = BigCurve::msm([gen, public_key], [u_1, u_2]);
 
     let r_point_x = r_point.x;
     let r_point_x_as_fr: BigNum<LIMBS, MODULUS_BIT_SIZE, Fr_PARAMS> =
         BigNum { limbs: r_point_x.limbs };
-    // 6. The signature is valid if r = R.x (mod n)
+    // 7. The signature is valid if r = R.x (mod n)
     // Need to have them in the same field to do the comparison
     r_point_x_as_fr == r
 }
@@ -385,10 +392,10 @@ fn test_brainpoolp384r1_signature_verification() {
 
     let s: BrainpoolP384r1Fr = BigNum {
         limbs: [
-            0xca44f5b5e489571ed70ffb06f8baca,
-            0x878d17ea34066411a8cf39f83016d8,
-            0xbc258489da53d75c1bc3263f9a9d13,
-            0x845799,
+            583843873855621341364149722400139931,
+            1212337095275413398733606627875066102,
+            1030624331378512455916955161925548059,
+            549252,
         ],
     };
 
@@ -435,10 +442,10 @@ fn test_brainpoolp384t1_signature_verification() {
 
     let s: BrainpoolP384t1Fr = BigNum {
         limbs: [
-            0x83847bbe454abc8451783c4c116a5c,
-            0x37ab01bf9582c3dcc117af5c19ff56,
-            0x479633bd14c90b67942b66feb50870,
-            0x86606f,
+            951208539839936891913486938762574601,
+            297886132094751777111077343000766584,
+            306609557383715756842695472429272255,
+            415919,
         ],
     };
 
@@ -486,11 +493,11 @@ fn test_brainpoolp512r1_signature_verification() {
 
     let s: BrainpoolP512r1Fr = BigNum {
         limbs: [
-            0x4c0efd3bd4266b117fc777a1ad6451,
-            0x3cb8fd090b34989d5fe33955debf93,
-            0x6e6cc1d8a6cf561c4f17bbc788b093,
-            0x9a726ed28e27cd04c8bfed6f5cdf4,
-            0xa93fb2dc,
+            528407777185039668069881093702786072,
+            163725918895628368670822680709138314,
+            359709166105429011205054976949200043,
+            1091733467074042237131228987782423193,
+            27126492,
         ],
     };
 
@@ -540,11 +547,11 @@ fn test_brainpoolp512t1_signature_verification() {
 
     let s: BrainpoolP512t1Fr = BigNum {
         limbs: [
-            0x651d41325a034561b2af6728f0bfdb,
-            0x383fb6406df2c941d2cf71fedb5afc,
-            0x1314d72cc11d655778928c6473abfd,
-            0x7b1023d78f324c848d45af468846da,
-            0x948c0bd9,
+            398311017405186900405056391525974158,
+            186954885950299626652744917756210209,
+            833991342457265350994683408517212481,
+            502874513420693716557925105329695155,
+            374444511,
         ],
     };
 
