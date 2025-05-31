@@ -184,7 +184,8 @@ let is_valid = verify_secp521r1_ecdsa::<64>(
 
 This library automatically protects against signature malleability attacks by enforcing canonical signature form. For any valid signature `(r, s)`, there could potentially be another valid signature `(r, n - s)` where `n` is the curve order. To prevent this, the library checks that `s ≤ n/2`, ensuring only one canonical form is accepted.
 
-This is implemented by checking that `s ≤ n/2`. This assumes the signature you pass has a s value less than n/2, so make sure to preprocess your ECDSA signatures before passing them to the library to ensure this. You can check how we do this in TypeScript [here](https://github.com/zkpassport/zkpassport-utils/blob/4cd85a51434492bb3d8b323ce8f1321217b9407f/src/circuit-matcher.ts#L256).
+This assumes the signature you pass has a s value less than n/2, otherwise you will get this error: `Signature s value is not in canonical form`.
+So make sure to preprocess your ECDSA signatures before passing them to the library to ensure this. You can check how we do this in TypeScript [here](https://github.com/zkpassport/zkpassport-utils/blob/4cd85a51434492bb3d8b323ce8f1321217b9407f/src/circuit-matcher.ts#L256).
 
 ## Examples
 
@@ -208,7 +209,7 @@ The ECDSA verification algorithm implemented follows the standard process:
 1. **Input processing**: Split the signature into its `r` and `s` components
 2. **Canonical form check**: Ensure `s ≤ n/2` to prevent malleability
 3. **Hash processing**: Pad the message hash to the appropriate size and convert it to a field element
-4. **Inverse computation**: Calculate `w = s^(-1) mod n` using the extended Euclidean algorithm
+4. **Inverse computation**: Calculate `w = s^(-1) mod n`
 5. **Scalar computation**: Calculate `u1 = e*w mod n` and `u2 = r*w mod n`
 6. **Public key validation**: Convert the public key to a point on the curve and ensure it is on the curve
 7. **Point computation**: Calculate `R = u1*G + u2*Q` using multi-scalar multiplication (MSM)
