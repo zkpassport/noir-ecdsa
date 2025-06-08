@@ -29,8 +29,8 @@ In your `Nargo.toml` file, add the version of this library you would like to ins
 
 ```toml
 [dependencies]
-noir_ecdsa = { tag = "v0.2.6", git = "https://github.com/zkpassport/noir-ecdsa" }
-bigcurve = {tag = "v0.7.0-2", git = "https://github.com/madztheo/noir_bigcurve"}
+noir_ecdsa = { tag = "v0.2.7", git = "https://github.com/zkpassport/noir-ecdsa" }
+bigcurve = {tag = "v0.9.0-1", git = "https://github.com/zkpassport/noir_bigcurve"}
 ```
 
 ## Usage
@@ -42,7 +42,7 @@ The library provides both a generic `verify_ecdsa` function and curve-specific c
 #### secp256r1 (P-256)
 
 ```rust
-use bigcurve::curves::secp256r1::{Secp256r1Fq, Secp256r1Fr};
+use bigcurve::curves::secp256r1::{Secp256r1_Fq, Secp256r1_Fr};
 use noir_ecdsa::ecdsa::verify_secp256r1_ecdsa;
 
 
@@ -50,12 +50,12 @@ use noir_ecdsa::ecdsa::verify_secp256r1_ecdsa;
 let message_hash: [u8; 32] = [/* your 32-byte hash */];
 
 // Public key coordinates (on the secp256r1 curve)
-let public_key_x: Secp256r1Fq = /* your public key x coordinate */;
-let public_key_y: Secp256r1Fq = /* your public key y coordinate */;
+let public_key_x: Secp256r1_Fq = /* your public key x coordinate */;
+let public_key_y: Secp256r1_Fq = /* your public key y coordinate */;
 
 // ECDSA signature (r, s)
-let signature_r: Secp256r1Fr = /* signature r component */;
-let signature_s: Secp256r1Fr = /* signature s component */;
+let signature_r: Secp256r1_Fr = /* signature r component */;
+let signature_s: Secp256r1_Fr = /* signature s component */;
 
 // Verify the signature
 let is_valid = verify_secp256r1_ecdsa(
@@ -71,14 +71,14 @@ assert(is_valid);
 #### secp384r1 (P-384)
 
 ```rust
-use bigcurve::curves::secp384r1::{Secp384r1Fq, Secp384r1Fr};
+use bigcurve::curves::secp384r1::{Secp384r1_Fq, Secp384r1_Fr};
 use noir_ecdsa::ecdsa::verify_secp384r1_ecdsa;
 
 let message_hash: [u8; 32] = [/* your hash */];
-let public_key_x: Secp384r1Fq = /* public key x */;
-let public_key_y: Secp384r1Fq = /* public key y */;
-let signature_r: Secp384r1Fr = /* signature r */;
-let signature_s: Secp384r1Fr = /* signature s */;
+let public_key_x: Secp384r1_Fq = /* public key x */;
+let public_key_y: Secp384r1_Fq = /* public key y */;
+let signature_r: Secp384r1_Fr = /* signature r */;
+let signature_s: Secp384r1_Fr = /* signature s */;
 
 let is_valid = verify_secp384r1_ecdsa(
     public_key_x,
@@ -91,14 +91,14 @@ let is_valid = verify_secp384r1_ecdsa(
 #### secp521r1 (P-521)
 
 ```rust
-use bigcurve::curves::secp521r1::{Secp521r1Fq, Secp521r1Fr};
+use bigcurve::curves::secp521r1::{Secp521r1_Fq, Secp521r1_Fr};
 use noir_ecdsa::ecdsa::verify_secp521r1_ecdsa;
 
 let message_hash: [u8; 32] = [/* your hash */];
-let public_key_x: Secp521r1Fq = /* public key x */;
-let public_key_y: Secp521r1Fq = /* public key y */;
-let signature_r: Secp521r1Fr = /* signature r */;
-let signature_s: Secp521r1Fr = /* signature s */;
+let public_key_x: Secp521r1_Fq = /* public key x */;
+let public_key_y: Secp521r1_Fq = /* public key y */;
+let signature_r: Secp521r1_Fr = /* signature r */;
+let signature_s: Secp521r1_Fr = /* signature s */;
 
 let is_valid = verify_secp521r1_ecdsa(
     public_key_x,
@@ -111,7 +111,7 @@ let is_valid = verify_secp521r1_ecdsa(
 #### Brainpool Curves
 
 ```rust
-use bigcurve::curves::brainpool::{BrainpoolP256r1Fq, BrainpoolP256r1Fr};
+use bigcurve::curves::brainpool::{BrainpoolP256r1_Fq, BrainpoolP256r1_Fr};
 use noir_ecdsa::ecdsa::{
     verify_brainpoolp256r1_ecdsa,
     verify_brainpoolp256t1_ecdsa,
@@ -123,10 +123,10 @@ use noir_ecdsa::ecdsa::{
 
 // Example with brainpoolP256r1
 let message_hash: [u8; 32] = [/* your hash */];
-let public_key_x: BrainpoolP256r1Fq = /* public key x */;
-let public_key_y: BrainpoolP256r1Fq = /* public key y */;
-let signature_r: BrainpoolP256r1Fr = /* signature r */;
-let signature_s: BrainpoolP256r1Fr = /* signature s */;
+let public_key_x: BrainpoolP256r1_Fq = /* public key x */;
+let public_key_y: BrainpoolP256r1_Fq = /* public key y */;
+let signature_r: BrainpoolP256r1_Fr = /* signature r */;
+let signature_s: BrainpoolP256r1_Fr = /* signature s */;
 
 let is_valid = verify_brainpoolp256r1_ecdsa(
     public_key_x,
@@ -142,9 +142,9 @@ For advanced use cases, you can use the generic `verify_ecdsa` function:
 
 ```rust
 use noir_ecdsa::ecdsa::verify_ecdsa;
-use bigcurve::curves::secp256r1::Secp256r1_Params;
+use bigcurve::curves::secp256r1::{Secp256r1_Fq, Secp256r1_Fr, Secp256r1_Params};
 
-let is_valid = verify_ecdsa::<32, 65, _, _, 32, _, _, Secp256r1_Params>(
+let is_valid = verify_ecdsa::<32, 65, Secp256r1_Fq, Secp256r1_Fr, Secp256r1_Params>(
     public_key_x,
     public_key_y,
     message_hash,
