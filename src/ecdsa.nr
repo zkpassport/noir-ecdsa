@@ -1,23 +1,20 @@
 use bigcurve::BigCurve;
-use bigcurve::BigCurveTrait;
-use bigcurve::CurveParamsTrait;
-use bigcurve::curves::brainpoolP192r1::BrainpoolP192r1_Params;
-use bigcurve::curves::brainpoolP192t1::BrainpoolP192t1_Params;
-use bigcurve::curves::brainpoolP224r1::BrainpoolP224r1_Params;
-use bigcurve::curves::brainpoolP224t1::BrainpoolP224t1_Params;
-use bigcurve::curves::brainpoolP256r1::BrainpoolP256r1_Params;
-use bigcurve::curves::brainpoolP256t1::BrainpoolP256t1_Params;
-use bigcurve::curves::brainpoolP384r1::BrainpoolP384r1_Params;
-use bigcurve::curves::brainpoolP384t1::BrainpoolP384t1_Params;
-use bigcurve::curves::brainpoolP512r1::BrainpoolP512r1_Params;
-use bigcurve::curves::brainpoolP512t1::BrainpoolP512t1_Params;
-use bigcurve::curves::secp192r1::Secp192r1_Params;
-use bigcurve::curves::secp224r1::Secp224r1_Params;
-use bigcurve::curves::secp256r1::Secp256r1_Params;
-use bigcurve::curves::secp384r1::Secp384r1_Params;
-use bigcurve::curves::secp521r1::Secp521r1_Params;
+use bigcurve::curves::brainpoolP192r1::BrainpoolP192r1;
+use bigcurve::curves::brainpoolP192t1::BrainpoolP192t1;
+use bigcurve::curves::brainpoolP224r1::BrainpoolP224r1;
+use bigcurve::curves::brainpoolP224t1::BrainpoolP224t1;
+use bigcurve::curves::brainpoolP256r1::BrainpoolP256r1;
+use bigcurve::curves::brainpoolP256t1::BrainpoolP256t1;
+use bigcurve::curves::brainpoolP384r1::BrainpoolP384r1;
+use bigcurve::curves::brainpoolP384t1::BrainpoolP384t1;
+use bigcurve::curves::brainpoolP512r1::BrainpoolP512r1;
+use bigcurve::curves::brainpoolP512t1::BrainpoolP512t1;
+use bigcurve::curves::secp192r1::Secp192r1;
+use bigcurve::curves::secp224r1::Secp224r1;
+use bigcurve::curves::secp256r1::Secp256r1;
+use bigcurve::curves::secp384r1::Secp384r1;
+use bigcurve::curves::secp521r1::Secp521r1;
 use bigcurve::scalar_field::ScalarField;
-use bigcurve::scalar_field::ScalarFieldTrait;
 use bignum::BigNum;
 use bignum::fields::brainpoolP192r1Fq::BrainpoolP192r1_Fq;
 use bignum::fields::brainpoolP192r1Fr::BrainpoolP192r1_Fr;
@@ -52,7 +49,7 @@ use bignum::fields::secp521r1Fr::Secp521r1_Fr;
 use sha256::sha256_var;
 
 // https://github.com/madztheo/noir-ecdsa/blob/main/lib/src/secp384r1.nr
-pub fn verify_ecdsa<let HASH_BYTE_SIZE: u32, let SCALAR_SLICES: u32, Fq, Fr, CurveParams>(
+pub fn verify_ecdsa<let HASH_BYTE_SIZE: u32, let SCALAR_SLICES: u32, Fq, Fr, Curve>(
     public_key_x: Fq,
     public_key_y: Fq,
     message_digest: [u8; HASH_BYTE_SIZE],
@@ -63,7 +60,7 @@ where
     Fr: std::convert::From<Field>,
     Fr: std::cmp::Ord,
     Fq: BigNum,
-    CurveParams: CurveParamsTrait<Fq>,
+    Curve: BigCurve<Fq>,
 {
     // 1. Unpack the signature (r, s)
     let (r, s) = signature;
@@ -88,11 +85,9 @@ where
     let e: Fr = Fr::from_be_bytes(formatted_message_digest);
 
     // 4. Compute w = s^-1 mod n
-    let w = unsafe {
-        //@safety: the inverse is computed here unconstrained but we make sure
-        // the inverse is valid by checking that s * w == 1 the line below
-        s.__invmod()
-    };
+    //Safety: the inverse is computed here unconstrained but we make sure
+    // the inverse is valid by checking that s * w == 1 the line below
+    let w = unsafe { s.__invmod() };
     // Check that s is the inverse of w since the previous line is unconstrained
     assert(s * w == BigNum::one());
 
@@ -101,16 +96,15 @@ where
     let u_2: ScalarField<SCALAR_SLICES> = ScalarField::from_bignum(r * w);
 
     // Convert public key to jacobian coordinates
-    let public_key: BigCurve<Fq, CurveParams> =
-        BigCurve { x: public_key_x, y: public_key_y, is_infinity: false };
+    let public_key = Curve::from_coordinates(public_key_x, public_key_y, false);
     public_key.validate_on_curve();
 
-    let gen: BigCurve<Fq, CurveParams> = BigCurve::one();
+    let gen = Curve::one();
 
     // 6. Compute the point R = u1G + u2Q
-    let r_point = BigCurve::msm([gen, public_key], [u_1, u_2]);
+    let r_point = Curve::evaluate_linear_expression([gen, public_key], [u_1, u_2], []);
 
-    let r_point_x = r_point.x;
+    let r_point_x = r_point.x();
     let r_point_x_as_fr: Fr = Fr::from_limbs(r_point_x.get_limbs());
     // 7. The signature is valid if r = R.x (mod n)
     // Need to have them in the same field to do the comparison
@@ -123,7 +117,7 @@ pub fn verify_secp521r1_ecdsa<let HASH_BYTE_SIZE: u32>(
     message_digest: [u8; HASH_BYTE_SIZE],
     signature: (Secp521r1_Fr, Secp521r1_Fr),
 ) -> bool {
-    verify_ecdsa::<HASH_BYTE_SIZE, 131, Secp521r1_Fq, Secp521r1_Fr, Secp521r1_Params>(
+    verify_ecdsa::<HASH_BYTE_SIZE, 131, Secp521r1_Fq, Secp521r1_Fr, Secp521r1>(
         public_key_x,
         public_key_y,
         message_digest,
@@ -137,7 +131,7 @@ pub fn verify_secp384r1_ecdsa<let HASH_BYTE_SIZE: u32>(
     message_digest: [u8; HASH_BYTE_SIZE],
     signature: (Secp384r1_Fr, Secp384r1_Fr),
 ) -> bool {
-    verify_ecdsa::<HASH_BYTE_SIZE, 97, Secp384r1_Fq, Secp384r1_Fr, Secp384r1_Params>(
+    verify_ecdsa::<HASH_BYTE_SIZE, 97, Secp384r1_Fq, Secp384r1_Fr, Secp384r1>(
         public_key_x,
         public_key_y,
         message_digest,
@@ -151,7 +145,7 @@ pub fn verify_secp256r1_ecdsa<let HASH_BYTE_SIZE: u32>(
     message_digest: [u8; HASH_BYTE_SIZE],
     signature: (Secp256r1_Fr, Secp256r1_Fr),
 ) -> bool {
-    verify_ecdsa::<HASH_BYTE_SIZE, 65, Secp256r1_Fq, Secp256r1_Fr, Secp256r1_Params>(
+    verify_ecdsa::<HASH_BYTE_SIZE, 65, Secp256r1_Fq, Secp256r1_Fr, Secp256r1>(
         public_key_x,
         public_key_y,
         message_digest,
@@ -165,7 +159,7 @@ pub fn verify_secp224r1_ecdsa<let HASH_BYTE_SIZE: u32>(
     message_digest: [u8; HASH_BYTE_SIZE],
     signature: (Secp224r1_Fr, Secp224r1_Fr),
 ) -> bool {
-    verify_ecdsa::<HASH_BYTE_SIZE, 57, Secp224r1_Fq, Secp224r1_Fr, Secp224r1_Params>(
+    verify_ecdsa::<HASH_BYTE_SIZE, 57, Secp224r1_Fq, Secp224r1_Fr, Secp224r1>(
         public_key_x,
         public_key_y,
         message_digest,
@@ -179,7 +173,7 @@ pub fn verify_secp192r1_ecdsa<let HASH_BYTE_SIZE: u32>(
     message_digest: [u8; HASH_BYTE_SIZE],
     signature: (Secp192r1_Fr, Secp192r1_Fr),
 ) -> bool {
-    verify_ecdsa::<HASH_BYTE_SIZE, 49, Secp192r1_Fq, Secp192r1_Fr, Secp192r1_Params>(
+    verify_ecdsa::<HASH_BYTE_SIZE, 49, Secp192r1_Fq, Secp192r1_Fr, Secp192r1>(
         public_key_x,
         public_key_y,
         message_digest,
@@ -193,7 +187,7 @@ pub fn verify_brainpoolp192r1_ecdsa<let HASH_BYTE_SIZE: u32>(
     message_digest: [u8; HASH_BYTE_SIZE],
     signature: (BrainpoolP192r1_Fr, BrainpoolP192r1_Fr),
 ) -> bool {
-    verify_ecdsa::<HASH_BYTE_SIZE, 49, BrainpoolP192r1_Fq, BrainpoolP192r1_Fr, BrainpoolP192r1_Params>(
+    verify_ecdsa::<HASH_BYTE_SIZE, 49, BrainpoolP192r1_Fq, BrainpoolP192r1_Fr, BrainpoolP192r1>(
         public_key_x,
         public_key_y,
         message_digest,
@@ -207,7 +201,7 @@ pub fn verify_brainpoolp192t1_ecdsa<let HASH_BYTE_SIZE: u32>(
     message_digest: [u8; HASH_BYTE_SIZE],
     signature: (BrainpoolP192t1_Fr, BrainpoolP192t1_Fr),
 ) -> bool {
-    verify_ecdsa::<HASH_BYTE_SIZE, 49, BrainpoolP192t1_Fq, BrainpoolP192t1_Fr, BrainpoolP192t1_Params>(
+    verify_ecdsa::<HASH_BYTE_SIZE, 49, BrainpoolP192t1_Fq, BrainpoolP192t1_Fr, BrainpoolP192t1>(
         public_key_x,
         public_key_y,
         message_digest,
@@ -221,7 +215,7 @@ pub fn verify_brainpoolp224r1_ecdsa<let HASH_BYTE_SIZE: u32>(
     message_digest: [u8; HASH_BYTE_SIZE],
     signature: (BrainpoolP224r1_Fr, BrainpoolP224r1_Fr),
 ) -> bool {
-    verify_ecdsa::<HASH_BYTE_SIZE, 57, BrainpoolP224r1_Fq, BrainpoolP224r1_Fr, BrainpoolP224r1_Params>(
+    verify_ecdsa::<HASH_BYTE_SIZE, 57, BrainpoolP224r1_Fq, BrainpoolP224r1_Fr, BrainpoolP224r1>(
         public_key_x,
         public_key_y,
         message_digest,
@@ -235,7 +229,7 @@ pub fn verify_brainpoolp224t1_ecdsa<let HASH_BYTE_SIZE: u32>(
     message_digest: [u8; HASH_BYTE_SIZE],
     signature: (BrainpoolP224t1_Fr, BrainpoolP224t1_Fr),
 ) -> bool {
-    verify_ecdsa::<HASH_BYTE_SIZE, 57, BrainpoolP224t1_Fq, BrainpoolP224t1_Fr, BrainpoolP224t1_Params>(
+    verify_ecdsa::<HASH_BYTE_SIZE, 57, BrainpoolP224t1_Fq, BrainpoolP224t1_Fr, BrainpoolP224t1>(
         public_key_x,
         public_key_y,
         message_digest,
@@ -249,7 +243,7 @@ pub fn verify_brainpoolp256r1_ecdsa<let HASH_BYTE_SIZE: u32>(
     message_digest: [u8; HASH_BYTE_SIZE],
     signature: (BrainpoolP256r1_Fr, BrainpoolP256r1_Fr),
 ) -> bool {
-    verify_ecdsa::<HASH_BYTE_SIZE, 65, BrainpoolP256r1_Fq, BrainpoolP256r1_Fr, BrainpoolP256r1_Params>(
+    verify_ecdsa::<HASH_BYTE_SIZE, 65, BrainpoolP256r1_Fq, BrainpoolP256r1_Fr, BrainpoolP256r1>(
         public_key_x,
         public_key_y,
         message_digest,
@@ -263,7 +257,7 @@ pub fn verify_brainpoolp256t1_ecdsa<let HASH_BYTE_SIZE: u32>(
     message_digest: [u8; HASH_BYTE_SIZE],
     signature: (BrainpoolP256t1_Fr, BrainpoolP256t1_Fr),
 ) -> bool {
-    verify_ecdsa::<HASH_BYTE_SIZE, 65, BrainpoolP256t1_Fq, BrainpoolP256t1_Fr, BrainpoolP256t1_Params>(
+    verify_ecdsa::<HASH_BYTE_SIZE, 65, BrainpoolP256t1_Fq, BrainpoolP256t1_Fr, BrainpoolP256t1>(
         public_key_x,
         public_key_y,
         message_digest,
@@ -277,7 +271,7 @@ pub fn verify_brainpoolp384r1_ecdsa<let HASH_BYTE_SIZE: u32>(
     message_digest: [u8; HASH_BYTE_SIZE],
     signature: (BrainpoolP384r1_Fr, BrainpoolP384r1_Fr),
 ) -> bool {
-    verify_ecdsa::<HASH_BYTE_SIZE, 97, BrainpoolP384r1_Fq, BrainpoolP384r1_Fr, BrainpoolP384r1_Params>(
+    verify_ecdsa::<HASH_BYTE_SIZE, 97, BrainpoolP384r1_Fq, BrainpoolP384r1_Fr, BrainpoolP384r1>(
         public_key_x,
         public_key_y,
         message_digest,
@@ -291,7 +285,7 @@ pub fn verify_brainpoolp384t1_ecdsa<let HASH_BYTE_SIZE: u32>(
     message_digest: [u8; HASH_BYTE_SIZE],
     signature: (BrainpoolP384t1_Fr, BrainpoolP384t1_Fr),
 ) -> bool {
-    verify_ecdsa::<HASH_BYTE_SIZE, 97, BrainpoolP384t1_Fq, BrainpoolP384t1_Fr, BrainpoolP384t1_Params>(
+    verify_ecdsa::<HASH_BYTE_SIZE, 97, BrainpoolP384t1_Fq, BrainpoolP384t1_Fr, BrainpoolP384t1>(
         public_key_x,
         public_key_y,
         message_digest,
@@ -305,7 +299,7 @@ pub fn verify_brainpoolp512r1_ecdsa<let HASH_BYTE_SIZE: u32>(
     message_digest: [u8; HASH_BYTE_SIZE],
     signature: (BrainpoolP512r1_Fr, BrainpoolP512r1_Fr),
 ) -> bool {
-    verify_ecdsa::<HASH_BYTE_SIZE, 129, BrainpoolP512r1_Fq, BrainpoolP512r1_Fr, BrainpoolP512r1_Params>(
+    verify_ecdsa::<HASH_BYTE_SIZE, 129, BrainpoolP512r1_Fq, BrainpoolP512r1_Fr, BrainpoolP512r1>(
         public_key_x,
         public_key_y,
         message_digest,
@@ -319,7 +313,7 @@ pub fn verify_brainpoolp512t1_ecdsa<let HASH_BYTE_SIZE: u32>(
     message_digest: [u8; HASH_BYTE_SIZE],
     signature: (BrainpoolP512t1_Fr, BrainpoolP512t1_Fr),
 ) -> bool {
-    verify_ecdsa::<HASH_BYTE_SIZE, 129, BrainpoolP512t1_Fq, BrainpoolP512t1_Fr, BrainpoolP512t1_Params>(
+    verify_ecdsa::<HASH_BYTE_SIZE, 129, BrainpoolP512t1_Fq, BrainpoolP512t1_Fr, BrainpoolP512t1>(
         public_key_x,
         public_key_y,
         message_digest,
