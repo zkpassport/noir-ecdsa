@@ -1,51 +1,21 @@
 use bigcurve::BigCurve;
-use bigcurve::curves::brainpoolP192r1::BrainpoolP192r1;
-use bigcurve::curves::brainpoolP192t1::BrainpoolP192t1;
-use bigcurve::curves::brainpoolP224r1::BrainpoolP224r1;
-use bigcurve::curves::brainpoolP224t1::BrainpoolP224t1;
-use bigcurve::curves::brainpoolP256r1::BrainpoolP256r1;
-use bigcurve::curves::brainpoolP256t1::BrainpoolP256t1;
-use bigcurve::curves::brainpoolP384r1::BrainpoolP384r1;
-use bigcurve::curves::brainpoolP384t1::BrainpoolP384t1;
-use bigcurve::curves::brainpoolP512r1::BrainpoolP512r1;
-use bigcurve::curves::brainpoolP512t1::BrainpoolP512t1;
-use bigcurve::curves::secp192r1::Secp192r1;
-use bigcurve::curves::secp224r1::Secp224r1;
-use bigcurve::curves::secp256r1::Secp256r1;
-use bigcurve::curves::secp384r1::Secp384r1;
-use bigcurve::curves::secp521r1::Secp521r1;
+use bigcurve::curves::brainpoolP192r1::{BrainpoolP192r1, BrainpoolP192r1_Fq, BrainpoolP192r1_Fr};
+use bigcurve::curves::brainpoolP192t1::{BrainpoolP192t1, BrainpoolP192t1_Fq, BrainpoolP192t1_Fr};
+use bigcurve::curves::brainpoolP224r1::{BrainpoolP224r1, BrainpoolP224r1_Fq, BrainpoolP224r1_Fr};
+use bigcurve::curves::brainpoolP224t1::{BrainpoolP224t1, BrainpoolP224t1_Fq, BrainpoolP224t1_Fr};
+use bigcurve::curves::brainpoolP256r1::{BrainpoolP256r1, BrainpoolP256r1_Fq, BrainpoolP256r1_Fr};
+use bigcurve::curves::brainpoolP256t1::{BrainpoolP256t1, BrainpoolP256t1_Fq, BrainpoolP256t1_Fr};
+use bigcurve::curves::brainpoolP384r1::{BrainpoolP384r1, BrainpoolP384r1_Fq, BrainpoolP384r1_Fr};
+use bigcurve::curves::brainpoolP384t1::{BrainpoolP384t1, BrainpoolP384t1_Fq, BrainpoolP384t1_Fr};
+use bigcurve::curves::brainpoolP512r1::{BrainpoolP512r1, BrainpoolP512r1_Fq, BrainpoolP512r1_Fr};
+use bigcurve::curves::brainpoolP512t1::{BrainpoolP512t1, BrainpoolP512t1_Fq, BrainpoolP512t1_Fr};
+use bigcurve::curves::secp192r1::{Secp192r1, Secp192r1_Fq, Secp192r1_Fr};
+use bigcurve::curves::secp224r1::{Secp224r1, Secp224r1_Fq, Secp224r1_Fr};
+use bigcurve::curves::secp256r1::{Secp256r1, Secp256r1_Fq, Secp256r1_Fr};
+use bigcurve::curves::secp384r1::{Secp384r1, Secp384r1_Fq, Secp384r1_Fr};
+use bigcurve::curves::secp521r1::{Secp521r1, Secp521r1_Fq, Secp521r1_Fr};
 use bigcurve::scalar_field::ScalarField;
 use bignum::BigNum;
-use bignum::fields::brainpoolP192r1Fq::BrainpoolP192r1_Fq;
-use bignum::fields::brainpoolP192r1Fr::BrainpoolP192r1_Fr;
-use bignum::fields::brainpoolP192t1Fq::BrainpoolP192t1_Fq;
-use bignum::fields::brainpoolP192t1Fr::BrainpoolP192t1_Fr;
-use bignum::fields::brainpoolP224r1Fq::BrainpoolP224r1_Fq;
-use bignum::fields::brainpoolP224r1Fr::BrainpoolP224r1_Fr;
-use bignum::fields::brainpoolP224t1Fq::BrainpoolP224t1_Fq;
-use bignum::fields::brainpoolP224t1Fr::BrainpoolP224t1_Fr;
-use bignum::fields::brainpoolP256r1Fq::BrainpoolP256r1_Fq;
-use bignum::fields::brainpoolP256r1Fr::BrainpoolP256r1_Fr;
-use bignum::fields::brainpoolP256t1Fq::BrainpoolP256t1_Fq;
-use bignum::fields::brainpoolP256t1Fr::BrainpoolP256t1_Fr;
-use bignum::fields::brainpoolP384r1Fq::BrainpoolP384r1_Fq;
-use bignum::fields::brainpoolP384r1Fr::BrainpoolP384r1_Fr;
-use bignum::fields::brainpoolP384t1Fq::BrainpoolP384t1_Fq;
-use bignum::fields::brainpoolP384t1Fr::BrainpoolP384t1_Fr;
-use bignum::fields::brainpoolP512r1Fq::BrainpoolP512r1_Fq;
-use bignum::fields::brainpoolP512r1Fr::BrainpoolP512r1_Fr;
-use bignum::fields::brainpoolP512t1Fq::BrainpoolP512t1_Fq;
-use bignum::fields::brainpoolP512t1Fr::BrainpoolP512t1_Fr;
-use bignum::fields::secp192r1Fq::Secp192r1_Fq;
-use bignum::fields::secp192r1Fr::Secp192r1_Fr;
-use bignum::fields::secp224r1Fq::Secp224r1_Fq;
-use bignum::fields::secp224r1Fr::Secp224r1_Fr;
-use bignum::fields::secp256r1Fq::Secp256r1_Fq;
-use bignum::fields::secp256r1Fr::Secp256r1_Fr;
-use bignum::fields::secp384r1Fq::Secp384r1_Fq;
-use bignum::fields::secp384r1Fr::Secp384r1_Fr;
-use bignum::fields::secp521r1Fq::Secp521r1_Fq;
-use bignum::fields::secp521r1Fr::Secp521r1_Fr;
 use sha256::sha256_var;
 
 // https://github.com/madztheo/noir-ecdsa/blob/main/lib/src/secp384r1.nr
@@ -89,7 +59,7 @@ where
     // the inverse is valid by checking that s * w == 1 the line below
     let w = unsafe { s.__invmod() };
     // Check that s is the inverse of w since the previous line is unconstrained
-    assert(s * w == BigNum::one());
+    assert(s * w == Fr::one());
 
     // 5. Compute u1 = ew mod n and u2 = rw mod n
     let u_1: ScalarField<SCALAR_SLICES> = ScalarField::from_bignum(e * w);
