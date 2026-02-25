@@ -14,7 +14,7 @@ use bigcurve::curves::secp224r1::{Secp224r1, Secp224r1_Fq, Secp224r1_Fr};
 use bigcurve::curves::secp256r1::{Secp256r1, Secp256r1_Fq, Secp256r1_Fr};
 use bigcurve::curves::secp384r1::{Secp384r1, Secp384r1_Fq, Secp384r1_Fr};
 use bigcurve::curves::secp521r1::{Secp521r1, Secp521r1_Fq, Secp521r1_Fr};
-use bigcurve::scalar_field::ScalarField;
+use bigcurve::ScalarField;
 use bignum::BigNum;
 use sha256::sha256_var;
 
@@ -75,7 +75,12 @@ where
     let r_point = Curve::evaluate_linear_expression([gen, public_key], [u_1, u_2], []);
 
     let r_point_x = r_point.x();
-    let r_point_x_as_fr: Fr = Fr::from_limbs(r_point_x.get_limbs());
+
+    // Convert Fq to Fr by copying limbs individually.
+    let mut r_point_x_as_fr = Fr::zero();
+    for i in 0..Fr::num_limbs(Fr::zero()) {
+        r_point_x_as_fr.set_limb(i, r_point_x.get_limb(i));
+    }
     // 7. The signature is valid if r = R.x (mod n)
     // Need to have them in the same field to do the comparison
     r_point_x_as_fr == r
