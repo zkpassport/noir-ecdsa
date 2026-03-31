@@ -4,7 +4,7 @@ Optimized Noir library that evaluates ECDSA (Elliptic Curve Digital Signature Al
 
 This library supports verification of ECDSA signatures on various elliptic curves including NIST standard curves (secp256r1, secp384r1, secp521r1) and Brainpool curves (brainpoolP256r1/t1, brainpoolP384r1/t1, brainpoolP512r1/t1).
 
-This library uses [noir-bignum](https://github.com/noir-lang/noir-bignum) as a dependency for big number arithmetic operations as well as a slightly modified version of [noir-bigcurve](https://github.com/madztheo/noir_bigcurve) for curve operations.
+This library uses [noir-bignum](https://github.com/noir-lang/noir-bignum) as a dependency for big number arithmetic operations as well as a slightly modified version of [noir-bigcurve](https://github.com/zkpassport/noir_bigcurve) for curve operations.
 
 ## Supported Curves
 
