@@ -34,6 +34,7 @@ where
 {
     // 1. Unpack the signature (r, s)
     let (r, s) = signature;
+    assert(r != Fr::zero(), "Signature r value is zero");
 
     // 2. Validate that s is in canonical form (s <= n/2) to prevent signature malleability
     // i.e. you could have two valid signatures (r, s) and (r, n - s) from one signature (r, s)
