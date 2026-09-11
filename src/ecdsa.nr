@@ -63,6 +63,11 @@ where
     for i in startIndex..formatted_message_digest.len() {
         formatted_message_digest[i] = message_digest[i - startIndex];
     }
+    // `from_be_bytes_unsafe` (not the canonical-validating `from_be_bytes`): in ECDSA the
+    // message representative `e` may be >= n. It is reduced mod n only when used (e.g.
+    // `u1 = e * w`), so requiring `e < n` would wrongly reject valid signatures whose digest
+    // is >= n. This is sound because `e`'s bytes are fixed by `message_digest`, leaving the
+    // prover no non-canonical representation to choose.
     let e: Fr = Fr::from_be_bytes_unsafe(formatted_message_digest);
 
     // 4. Compute w = s^-1 mod n
