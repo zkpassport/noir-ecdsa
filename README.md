@@ -35,7 +35,7 @@ In your `Nargo.toml` file, add the version of this library you would like to ins
 
 ```toml
 [dependencies]
-noir_ecdsa = { tag = "v0.4.1", git = "https://github.com/zkpassport/noir-ecdsa" }
+noir_ecdsa = { tag = "v0.5.0", git = "https://github.com/zkpassport/noir-ecdsa" }
 bigcurve = {tag = "v0.14.0-2", git = "https://github.com/zkpassport/noir_bigcurve"}
 ```
 
