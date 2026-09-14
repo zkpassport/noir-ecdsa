@@ -2,20 +2,26 @@
 
 Optimized Noir library that evaluates ECDSA (Elliptic Curve Digital Signature Algorithm) signatures for multiple elliptic curves.
 
-This library supports verification of ECDSA signatures on various elliptic curves including NIST standard curves (secp256r1, secp384r1, secp521r1) and Brainpool curves (brainpoolP256r1/t1, brainpoolP384r1/t1, brainpoolP512r1/t1).
+This library supports verification of ECDSA signatures on various elliptic curves including NIST standard curves (secp192r1, secp224r1, secp256r1, secp384r1, secp521r1) and Brainpool curves (brainpoolP192r1/t1, brainpoolP224r1/t1, brainpoolP256r1/t1, brainpoolP384r1/t1, brainpoolP512r1/t1).
 
-This library uses [noir-bignum](https://github.com/noir-lang/noir-bignum) as a dependency for big number arithmetic operations as well as a slightly modified version of [noir-bigcurve](https://github.com/madztheo/noir_bigcurve) for curve operations.
+This library uses a slightly modified version of [noir-bignum](https://github.com/zkpassport/noir-bignum) as a dependency for big number arithmetic operations as well as a slightly modified version of [noir-bigcurve](https://github.com/zkpassport/noir_bigcurve) for curve operations.
 
 ## Supported Curves
 
 ### NIST Curves
 
+- **secp192r1** (P-192): 192-bit prime field curve
+- **secp224r1** (P-224): 224-bit prime field curve
 - **secp256r1** (P-256): 256-bit prime field curve
 - **secp384r1** (P-384): 384-bit prime field curve
 - **secp521r1** (P-521): 521-bit prime field curve
 
 ### Brainpool Curves
 
+- **brainpoolP192r1**: 192-bit Brainpool curve
+- **brainpoolP192t1**: 192-bit Brainpool curve (twisted)
+- **brainpoolP224r1**: 224-bit Brainpool curve
+- **brainpoolP224t1**: 224-bit Brainpool curve (twisted)
 - **brainpoolP256r1**: 256-bit Brainpool curve
 - **brainpoolP256t1**: 256-bit Brainpool curve (twisted)
 - **brainpoolP384r1**: 384-bit Brainpool curve
@@ -29,8 +35,8 @@ In your `Nargo.toml` file, add the version of this library you would like to ins
 
 ```toml
 [dependencies]
-noir_ecdsa = { tag = "v0.2.7", git = "https://github.com/zkpassport/noir-ecdsa" }
-bigcurve = {tag = "v0.9.0-1", git = "https://github.com/zkpassport/noir_bigcurve"}
+noir_ecdsa = { tag = "v0.5.0", git = "https://github.com/zkpassport/noir-ecdsa" }
+bigcurve = {tag = "v0.14.0-2", git = "https://github.com/zkpassport/noir_bigcurve"}
 ```
 
 ## Usage
@@ -52,10 +58,14 @@ let message_hash: [u8; 32] = [/* your 32-byte hash */];
 // Public key coordinates (on the secp256r1 curve)
 let public_key_x: Secp256r1_Fq = /* your public key x coordinate */;
 let public_key_y: Secp256r1_Fq = /* your public key y coordinate */;
+// Both must be valid field elements: either call `validate_in_field()` on them,
+// or obtain them from `from_be_bytes` / `from_le_bytes`, which validate for you.
 
 // ECDSA signature (r, s)
 let signature_r: Secp256r1_Fr = /* signature r component */;
 let signature_s: Secp256r1_Fr = /* signature s component */;
+// Both must be valid field elements: either call `validate_in_field()` on them,
+// or obtain them from `from_be_bytes` / `from_le_bytes`, which validate for you.
 
 // Verify the signature
 let is_valid = verify_secp256r1_ecdsa(
@@ -111,8 +121,12 @@ let is_valid = verify_secp521r1_ecdsa(
 #### Brainpool Curves
 
 ```rust
-use bigcurve::curves::brainpool::{BrainpoolP256r1_Fq, BrainpoolP256r1_Fr};
+use bigcurve::curves::brainpoolP256r1::{BrainpoolP256r1_Fq, BrainpoolP256r1_Fr};
 use noir_ecdsa::ecdsa::{
+    verify_brainpoolp192r1_ecdsa,
+    verify_brainpoolp192t1_ecdsa,
+    verify_brainpoolp224r1_ecdsa,
+    verify_brainpoolp224t1_ecdsa,
     verify_brainpoolp256r1_ecdsa,
     verify_brainpoolp256t1_ecdsa,
     verify_brainpoolp384r1_ecdsa,
@@ -142,9 +156,9 @@ For advanced use cases, you can use the generic `verify_ecdsa` function:
 
 ```rust
 use noir_ecdsa::ecdsa::verify_ecdsa;
-use bigcurve::curves::secp256r1::{Secp256r1_Fq, Secp256r1_Fr, Secp256r1_Params};
+use bigcurve::curves::secp256r1::{Secp256r1, Secp256r1_Fq, Secp256r1_Fr};
 
-let is_valid = verify_ecdsa::<32, 65, Secp256r1_Fq, Secp256r1_Fr, Secp256r1_Params>(
+let is_valid = verify_ecdsa::<32, 65, Secp256r1_Fq, Secp256r1_Fr, Secp256r1>(
     public_key_x,
     public_key_y,
     message_hash,
@@ -187,9 +201,18 @@ This library automatically protects against signature malleability attacks by en
 This assumes the signature you pass has a s value less than n/2, otherwise you will get this error: `Signature s value is not in canonical form`.
 So make sure to preprocess your ECDSA signatures before passing them to the library to ensure this. You can check how we do this in TypeScript [here](https://github.com/zkpassport/zkpassport-utils/blob/4cd85a51434492bb3d8b323ce8f1321217b9407f/src/circuit-matcher.ts#L256).
 
+### Input Assumptions
+
+- **`r` and `s` are expected to be valid field elements.** Either call `validate_in_field` on them, or use the safe `from_be_bytes` / `from_le_bytes` versions when importing them from bytes.
+- **The `s <= n/2` malleability check is a requirement on the caller.** You must pass the low-`s` form of the signature, otherwise verification fails (see "Signature Malleability Protection" above).
+- **`public_key_x` and `public_key_y` must be valid field elements.** As with `r` and `s`, either call `validate_in_field` on them, or use the safe `from_be_bytes` / `from_le_bytes` versions when importing them from bytes, so an out-of-range limb encoding can't slip through.
+- **The public key must lie on the curve.** The library enforces this with `validate_on_curve()`; do not remove it. Skipping it allows an invalid-curve attack, where a prover supplies an off-curve point and forges a passing verification.
+- **The public key must NOT be a free private witness.** This is a soundness requirement, not a nicety. `validate_on_curve()` only checks that the point is a valid curve point, not that it is the *expected* signer's key. If `public_key_x` / `public_key_y` are supplied as private, prover-controlled inputs, verification is **unsound**: an attacker can generate their own keypair, sign any message with it, and prove a "valid signature" for arbitrary data. Always bind the public key to something the verifier trusts, e.g. expose it as a public input, hash it into the public inputs, or check it against a trusted key registry.
+- **The final `R.x == r` comparison casts `R.x` limb by limb from the base field into the scalar field.** This works for the supported curves. The rule is `bitlen(Fq) <= bitlen(Fr)`: if the base field modulus `p` has more bits than the scalar field modulus `n`, `R.x` could overflow the scalar field's range. Check the bit lengths, do not assume - cofactor > 1 is a red flag (`n << p`), but even a cofactor-1 curve can have `bitlen(Fq) > bitlen(Fr)` when `p` sits just above a power of two. (The reverse, `n` wider than `p`, is fine.)
+
 ## Examples
 
-See the test functions in `src/ecdsa.nr` for complete working examples of each curve. Each test demonstrates the following:
+See the test functions in `src/tests.nr` for complete working examples of each curve. Each test demonstrates the following:
 
 1. Computing a SHA-256 hash of a message
 2. Setting up public key coordinates and signature values
@@ -207,13 +230,14 @@ nargo test
 The ECDSA verification algorithm implemented follows the standard process:
 
 1. **Input processing**: Split the signature into its `r` and `s` components
-2. **Canonical form check**: Ensure `s ≤ n/2` to prevent malleability
-3. **Hash processing**: Pad the message hash to the appropriate size and convert it to a field element
-4. **Inverse computation**: Calculate `w = s^(-1) mod n`
-5. **Scalar computation**: Calculate `u1 = e*w mod n` and `u2 = r*w mod n`
-6. **Public key validation**: Convert the public key to a point on the curve and ensure it is on the curve
-7. **Point computation**: Calculate `R = u1*G + u2*Q` using multi-scalar multiplication (MSM)
-8. **Verification**: Check if `R.x ≡ r (mod n)`, the final check to ensure the signature is valid
+2. **Non-zero check**: Ensure `r != 0 (mod n)`, which also rejects the non-canonical `r == n`
+3. **Canonical form check**: Ensure `s ≤ n/2` to prevent malleability
+4. **Hash processing**: Pad the message hash to the appropriate size and convert it to a field element
+5. **Inverse computation**: Calculate `w = s^(-1) mod n`
+6. **Scalar computation**: Calculate `u1 = e*w mod n` and `u2 = r*w mod n`
+7. **Public key validation**: Convert the public key to a point on the curve and ensure it is on the curve
+8. **Point computation**: Calculate `R = u1*G + u2*Q` using multi-scalar multiplication (MSM)
+9. **Verification**: Check if `R.x ≡ r (mod n)`, the final check to ensure the signature is valid
 
 Where:
 
