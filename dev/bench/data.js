@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1789385732418,
+  "lastUpdate": 1789385985852,
   "repoUrl": "https://github.com/zkpassport/noir-ecdsa",
   "entries": {
     "ACIR Opcodes": [
@@ -423,6 +423,105 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/zkpassport/noir-ecdsa/commit/ad94905dc2b7800e70f09a9b412dfdfae4a190e8"
         },
         "date": 1789385413647,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "verify_brainpoolp192r1",
+            "value": 120880,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp192t1",
+            "value": 120878,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp224r1",
+            "value": 122044,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp224t1",
+            "value": 122042,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp256r1",
+            "value": 184502,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp256t1",
+            "value": 184498,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp384r1",
+            "value": 223238,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp384t1",
+            "value": 223232,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp512r1",
+            "value": 250401,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp512t1",
+            "value": 250393,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_secp192r1",
+            "value": 120878,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_secp224r1",
+            "value": 122042,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_secp256r1",
+            "value": 184498,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_secp384r1",
+            "value": 221287,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_secp521r1",
+            "value": 241416,
+            "unit": "opcodes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "75146596+Sarkoxed@users.noreply.github.com",
+            "name": "Sarkoxed",
+            "username": "Sarkoxed"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "94ab77ed0cdc99309115fae383eb011af2bd0f48",
+          "message": "Merge pull request #5 from zkpassport/as/update-readme\n\nchore: update README.md",
+          "timestamp": "2026-09-14T14:30:30+03:00",
+          "tree_id": "9d5e33b36d973a502ebb48eb5c5c3a3410b20164",
+          "url": "https://github.com/zkpassport/noir-ecdsa/commit/94ab77ed0cdc99309115fae383eb011af2bd0f48"
+        },
+        "date": 1789385985841,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
