@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792423291682,
+  "lastUpdate": 1792423517853,
   "repoUrl": "https://github.com/zkpassport/noir-ecdsa",
   "entries": {
     "ACIR Opcodes": [
@@ -795,6 +795,105 @@ window.BENCHMARK_DATA = {
           {
             "name": "verify_secp521r1",
             "value": 241416,
+            "unit": "opcodes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "75146596+Sarkoxed@users.noreply.github.com",
+            "name": "Sarkoxed",
+            "username": "Sarkoxed"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "83e1cc62d69358f095e84a340d0c2d64b6d0cd9b",
+          "message": "Merge pull request #6 from zkpassport/as/bump-libs-2\n\nchore: Bump workflows, bignum and bigcurve versions",
+          "timestamp": "2026-10-19T18:16:42+03:00",
+          "tree_id": "1967eb27dca4485f1ec64ebe20b382322b33bfd6",
+          "url": "https://github.com/zkpassport/noir-ecdsa/commit/83e1cc62d69358f095e84a340d0c2d64b6d0cd9b"
+        },
+        "date": 1792423517838,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "verify_brainpoolp192r1",
+            "value": 120914,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp192t1",
+            "value": 120912,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp224r1",
+            "value": 122078,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp224t1",
+            "value": 122076,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp256r1",
+            "value": 181769,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp256t1",
+            "value": 181765,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp384r1",
+            "value": 223334,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp384t1",
+            "value": 223328,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp512r1",
+            "value": 252693,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_brainpoolp512t1",
+            "value": 252685,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_secp192r1",
+            "value": 120912,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_secp224r1",
+            "value": 122076,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_secp256r1",
+            "value": 181765,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_secp384r1",
+            "value": 221383,
+            "unit": "opcodes"
+          },
+          {
+            "name": "verify_secp521r1",
+            "value": 243708,
             "unit": "opcodes"
           }
         ]
