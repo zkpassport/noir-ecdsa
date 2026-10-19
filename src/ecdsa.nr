@@ -92,11 +92,8 @@ where
     // Convert the public key to a curve point.
     // SECURITY: an off-curve / invalid-curve public key must be rejected, otherwise a prover
     // could forge a passing verification (invalid-curve attack).
+    // NOTE: `from_coordinates` already validates the point to be on the curve.
     let public_key = Curve::from_coordinates(public_key_x, public_key_y, false);
-
-    // `from_coordinates` does not check the point is on the curve yet, so we do it explicitly.
-    // TODO(sasha): remove when the bigcurve is updated (from_coordinates will validate on curve).
-    public_key.validate_on_curve();
 
     let gen = Curve::one();
 
